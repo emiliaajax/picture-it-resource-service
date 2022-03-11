@@ -48,7 +48,14 @@ const authenticateJWT = (req, res, next) => {
   }
 }
 
+router.param('id', (req, res, next, id) => controller.loadImage(req, res, next, id))
+
 router.get('/',
   authenticateJWT,
   (req, res, next) => controller.findAll(req, res, next)
+)
+
+router.get('/:id',
+  authenticateJWT,
+  (req, res, next) => controller.find(req, res, next)
 )
