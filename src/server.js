@@ -25,7 +25,7 @@ try {
   app.use(logger('dev'))
 
   // Parses requests of the content type application/json.
-  app.use(express.json())
+  app.use(express.json({ limit: '500kb' }))
 
   // Registers routes.
   app.use('/', router)
