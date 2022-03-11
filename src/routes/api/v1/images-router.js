@@ -59,3 +59,8 @@ router.get('/:id',
   authenticateJWT,
   (req, res, next) => controller.find(req, res, next)
 )
+
+router.post('/',
+  authenticateJWT,
+  (req, res, next) => controller.create(req, res, next)
+)
