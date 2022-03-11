@@ -8,11 +8,11 @@
 import express from 'express'
 import jwt from 'jsonwebtoken'
 import createError from 'http-errors'
-// import { ImagesController } from '../../../controllers/api/images-controller.js'
+import { ImagesController } from '../../../controllers/api/images-controller.js'
 
 export const router = express.Router()
 
-// const controller = new ImagesController()
+const controller = new ImagesController()
 
 /**
  * Authenticates the request.
@@ -29,7 +29,10 @@ const authenticateJWT = (req, res, next) => {
       throw new Error('Invalid authentication scheme')
     }
 
-    const payload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
+    const payload = jwt.verify(token, Buffer.from(process.env.ACCESS_TOKEN_SECRET, 'base64').toString('ascii'),
+      {
+        algorithms: 'RS256'
+      })
     req.user = {
       username: payload.sub,
       firstName: payload.given_name,
@@ -45,4 +48,7 @@ const authenticateJWT = (req, res, next) => {
   }
 }
 
-router.get('/', authenticateJWT)
+router.get('/',
+  authenticateJWT,
+  (req, res, next) => controller.findAll(req, res, next)
+)
