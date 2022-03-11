@@ -63,4 +63,39 @@ export class ImagesController {
   find (req, res, next) {
     res.json(req.image)
   }
+
+  /**
+   * Creates a new image.
+   *
+   * @param {object} req Express request object.
+   * @param {object} res Express response object.
+   * @param {Function} next Express next middleware function.
+   */
+  async create (req, res, next) {
+    try {
+      const response = await fetch('https://courselab.lnu.se/picture-it/images/api/v1/images', {
+        method: 'POST',
+        headers: {
+          'X-API-Private-Token': process.env.PERSONAL_ACCESS_TOKEN
+        },
+        body: {
+          data: req.body.data,
+          contentType: req.body.contentType
+        }
+      }).json()
+
+      const image = new Image({
+        imageUrl: response.imageUrl,
+        description: req.body.description
+      })
+
+      await image.save()
+
+      res
+        .status(201)
+        .json(image)
+    } catch (error) {
+      next(error)
+    }
+  }
 }
