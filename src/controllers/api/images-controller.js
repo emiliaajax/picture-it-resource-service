@@ -7,28 +7,12 @@
 
 import { Image } from '../../models/image.js'
 import createError from 'http-errors'
+import fetch from 'node-fetch'
 
 /**
  * Encapsulates a controller.
  */
 export class ImagesController {
-  /**
-   * Sends a JSON response containing all tasks.
-   *
-   * @param {object} req Express request object.
-   * @param {object} res Express response object.
-   * @param {Function} next Express next middleware function.
-   */
-  async findAll (req, res, next) {
-    try {
-      const images = await Image.find()
-
-      res.json(images)
-    } catch (error) {
-      next(error)
-    }
-  }
-
   /**
    * Provides req.image to the routes if id is present.
    *
@@ -48,6 +32,23 @@ export class ImagesController {
 
       req.image = image
       next()
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * Sends a JSON response containing all tasks.
+   *
+   * @param {object} req Express request object.
+   * @param {object} res Express response object.
+   * @param {Function} next Express next middleware function.
+   */
+  async findAll (req, res, next) {
+    try {
+      const images = await Image.find()
+
+      res.json(images)
     } catch (error) {
       next(error)
     }
@@ -76,16 +77,19 @@ export class ImagesController {
       const response = await fetch('https://courselab.lnu.se/picture-it/images/api/v1/images', {
         method: 'POST',
         headers: {
+          'Content-Type': 'application/json',
           'X-API-Private-Token': process.env.PERSONAL_ACCESS_TOKEN
         },
-        body: {
-          data: req.body.data,
+        body: JSON.stringify({
+          data: Buffer.from(req.body.data, 'base64'),
           contentType: req.body.contentType
-        }
-      }).json()
+        })
+      })
+
+      const data = await response.json()
 
       const image = new Image({
-        imageUrl: response.imageUrl,
+        imageUrl: data.imageUrl,
         description: req.body.description
       })
 
@@ -98,4 +102,17 @@ export class ImagesController {
       next(error)
     }
   }
+
+  // async edit (req, res, next) {
+  //   await fetch(`https://courselab.lnu.se/picture-it/images/api/v1/images/${id}`, {
+  //     method: 'PUT',
+  //     headers: {
+  //       'X-API-Private-Token': process.env.PERSONAL_ACCESS_TOKEN
+  //     },
+  //     body: {
+  //       data: req.body.data,
+  //       contentType: req.body.contentType
+  //     }
+  //   })
+  // }
 }

@@ -17,6 +17,7 @@ const schema = new mongoose.Schema({
 }, {
   timestamps: true,
   toJSON: {
+    virtuals: true,
     /**
      * Removes sensitive information by transforming the resulting object.
      *
@@ -27,8 +28,7 @@ const schema = new mongoose.Schema({
       delete ret._id
       delete ret.__v
     }
-  },
-  virtuals: true
+  }
 })
 
 schema.virtual('id').get(function () {
