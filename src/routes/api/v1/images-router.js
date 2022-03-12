@@ -74,3 +74,8 @@ router.patch('/:id',
   authenticateJWT,
   (req, res, next) => controller.partialEdit(req, res, next)
 )
+
+router.delete('/:id',
+  authenticateJWT,
+  (req, res, next) => controller.delete(req, res, next)
+)

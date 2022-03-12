@@ -176,4 +176,30 @@ export class ImagesController {
       next(error)
     }
   }
+
+  /**
+   * Deletes image.
+   *
+   * @param {object} req Express request object.
+   * @param {object} res Express response object.
+   * @param {Function} next Express next middleware function.
+   */
+  async delete (req, res, next) {
+    try {
+      await fetch(`https://courselab.lnu.se/picture-it/images/api/v1/images/${req.image.imageId}`, {
+        method: 'DELETE',
+        headers: {
+          'X-API-Private-Token': process.env.PERSONAL_ACCESS_TOKEN
+        }
+      })
+
+      await req.image.deleteOne()
+
+      res
+        .status(204)
+        .end()
+    } catch (error) {
+      next(error)
+    }
+  }
 }
