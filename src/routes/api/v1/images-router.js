@@ -69,3 +69,8 @@ router.put('/:id',
   authenticateJWT,
   (req, res, next) => controller.edit(req, res, next)
 )
+
+router.patch('/:id',
+  authenticateJWT,
+  (req, res, next) => controller.partialEdit(req, res, next)
+)

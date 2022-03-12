@@ -105,7 +105,7 @@ export class ImagesController {
   }
 
   /**
-   * Edits a existing image.
+   * Edits an existing image.
    *
    * @param {object} req Express request object.
    * @param {object} res Express response object.
@@ -119,15 +119,55 @@ export class ImagesController {
           'Content-Type': 'application/json',
           'X-API-Private-Token': process.env.PERSONAL_ACCESS_TOKEN
         },
-        body: {
-          data: req.body.data,
+        body: JSON.stringify({
+          data: Buffer.from(req.body.data, 'base64'),
           contentType: req.body.contentType
-        }
+        })
       })
 
       req.image.description = req.body.description
 
       await req.image.save()
+
+      res
+        .status(204)
+        .end()
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * Partially edits an existing image.
+   *
+   * @param {object} req Express request object.
+   * @param {object} res Express response object.
+   * @param {Function} next Express next middleware function.
+   */
+  async partialEdit (req, res, next) {
+    try {
+      if (req.body.data || req.body.contentType) {
+        const imageData = {}
+        if (req.body.data) {
+          imageData.data = req.body.data
+        }
+        if (req.body.contentType) {
+          imageData.contentType = req.body.contentType
+        }
+        await fetch(`https://courselab.lnu.se/picture-it/images/api/v1/images/${req.image.imageId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-API-Private-Token': process.env.PERSONAL_ACCESS_TOKEN
+          },
+          body: JSON.stringify(imageData)
+        })
+      }
+
+      if (req.body.description) {
+        req.image.description = req.body.description
+        await req.image.save()
+      }
 
       res
         .status(204)
