@@ -64,3 +64,8 @@ router.post('/',
   authenticateJWT,
   (req, res, next) => controller.create(req, res, next)
 )
+
+router.put('/:id',
+  authenticateJWT,
+  (req, res, next) => controller.edit(req, res, next)
+)

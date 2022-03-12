@@ -90,7 +90,8 @@ export class ImagesController {
 
       const image = new Image({
         imageUrl: data.imageUrl,
-        description: req.body.description
+        description: req.body.description,
+        imageId: data.id
       })
 
       await image.save()
@@ -103,16 +104,36 @@ export class ImagesController {
     }
   }
 
-  // async edit (req, res, next) {
-  //   await fetch(`https://courselab.lnu.se/picture-it/images/api/v1/images/${id}`, {
-  //     method: 'PUT',
-  //     headers: {
-  //       'X-API-Private-Token': process.env.PERSONAL_ACCESS_TOKEN
-  //     },
-  //     body: {
-  //       data: req.body.data,
-  //       contentType: req.body.contentType
-  //     }
-  //   })
-  // }
+  /**
+   * Edits a existing image.
+   *
+   * @param {object} req Express request object.
+   * @param {object} res Express response object.
+   * @param {Function} next Express next middleware function.
+   */
+  async edit (req, res, next) {
+    try {
+      await fetch(`https://courselab.lnu.se/picture-it/images/api/v1/images/${req.image.imageId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Private-Token': process.env.PERSONAL_ACCESS_TOKEN
+        },
+        body: {
+          data: req.body.data,
+          contentType: req.body.contentType
+        }
+      })
+
+      req.image.description = req.body.description
+
+      await req.image.save()
+
+      res
+        .status(204)
+        .end()
+    } catch (error) {
+      next(error)
+    }
+  }
 }

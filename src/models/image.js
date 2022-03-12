@@ -13,6 +13,9 @@ const schema = new mongoose.Schema({
   },
   description: {
     type: String
+  },
+  imageId: {
+    type: String
   }
 }, {
   timestamps: true,
@@ -27,6 +30,7 @@ const schema = new mongoose.Schema({
     transform: function (doc, ret) {
       delete ret._id
       delete ret.__v
+      delete ret.imageId
     }
   }
 })
