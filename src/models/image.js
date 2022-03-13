@@ -9,10 +9,12 @@ import mongoose from 'mongoose'
 
 const schema = new mongoose.Schema({
   owner: {
-    type: String
+    type: String,
+    required: true
   },
   imageUrl: {
-    type: String
+    type: String,
+    required: true
   },
   description: {
     type: String

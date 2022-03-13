@@ -128,7 +128,6 @@ export class ImagesController {
       if (error.name === 'ValidationError') {
         err = createError(400)
         err.cause = error
-        err.message = 'The request cannot or will not be processed due to something that is perceived to be a client error (for example validation error).'
       }
       next(err)
     }
@@ -167,7 +166,6 @@ export class ImagesController {
       if (error.name === 'ValidationError') {
         err = createError(400)
         err.cause = error
-        err.message = 'The request cannot or will not be processed due to something that is perceived to be a client error (for example validation error).'
       }
       next(err)
     }
@@ -213,7 +211,6 @@ export class ImagesController {
       if (error.name === 'ValidationError') {
         err = createError(400)
         err.cause = error
-        err.message = 'The request cannot or will not be processed due to something that is perceived to be a client error (for example validation error).'
       }
       next(err)
     }

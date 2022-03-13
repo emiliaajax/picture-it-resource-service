@@ -34,10 +34,15 @@ try {
   app.use(function (err, req, res, next) {
     err.status = err.status || 500
 
+    if (err.status === 500) {
+      err.message = 'An unexpected condition was encountered.'
+    }
+
+    if (err.status === 400) {
+      err.message = 'The request cannot or will not be processed due to something that is perceived to be a client error (for example validation error)'
+    }
+
     if (req.app.get('env') !== 'development') {
-      if (err.status === 500) {
-        err.message = 'An unexpected condition was encountered.'
-      }
       return res
         .status(err.status)
         .json({
