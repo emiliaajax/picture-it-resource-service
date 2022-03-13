@@ -35,6 +35,9 @@ try {
     err.status = err.status || 500
 
     if (req.app.get('env') !== 'development') {
+      if (err.status === 500) {
+        err.message = 'An unexpected condition was encountered.'
+      }
       return res
         .status(err.status)
         .json({

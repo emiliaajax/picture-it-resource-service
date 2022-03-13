@@ -33,8 +33,10 @@ const authenticateJWT = (req, res, next) => {
       {
         algorithms: 'RS256'
       })
+
     req.user = {
-      username: payload.sub,
+      id: payload.sub,
+      username: payload.username,
       firstName: payload.given_name,
       lastName: payload.family_name,
       email: payload.email
@@ -42,7 +44,8 @@ const authenticateJWT = (req, res, next) => {
 
     next()
   } catch (error) {
-    const err = createError(403)
+    const err = createError(401)
+    err.message = 'Access token invalid or not provided.'
     err.cause = error
     next(err)
   }
@@ -57,6 +60,7 @@ router.get('/',
 
 router.get('/:id',
   authenticateJWT,
+  (req, res, next) => controller.authorize(req, res, next),
   (req, res, next) => controller.find(req, res, next)
 )
 
@@ -67,15 +71,18 @@ router.post('/',
 
 router.put('/:id',
   authenticateJWT,
+  (req, res, next) => controller.authorize(req, res, next),
   (req, res, next) => controller.edit(req, res, next)
 )
 
 router.patch('/:id',
   authenticateJWT,
+  (req, res, next) => controller.authorize(req, res, next),
   (req, res, next) => controller.partialEdit(req, res, next)
 )
 
 router.delete('/:id',
   authenticateJWT,
+  (req, res, next) => controller.authorize(req, res, next),
   (req, res, next) => controller.delete(req, res, next)
 )

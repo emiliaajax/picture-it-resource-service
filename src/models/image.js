@@ -8,6 +8,9 @@
 import mongoose from 'mongoose'
 
 const schema = new mongoose.Schema({
+  owner: {
+    type: String
+  },
   imageUrl: {
     type: String
   },
@@ -31,6 +34,7 @@ const schema = new mongoose.Schema({
       delete ret._id
       delete ret.__v
       delete ret.imageId
+      delete ret.owner
     }
   }
 })

@@ -14,6 +14,23 @@ import fetch from 'node-fetch'
  */
 export class ImagesController {
   /**
+   * Authorizes the user.
+   *
+   * @param {object} req Express request object.
+   * @param {object} res Express response object.
+   * @param {Function} next Express next middleware function.
+   * @returns {Function} Express next middleware function.
+   */
+  async authorize (req, res, next) {
+    if (req.user.id !== req.image.owner) {
+      const err = createError(403)
+      err.message = 'The request contained valid data and was understood by the server, but the server is refusing action due to the authenticated user not having the necessary permissions for the resource.'
+      next(err)
+    }
+    next()
+  }
+
+  /**
    * Provides req.image to the routes if id is present.
    *
    * @param {object} req Express request object.
@@ -26,7 +43,9 @@ export class ImagesController {
       const image = await Image.findById(id)
 
       if (!image) {
-        next(createError(404))
+        const err = createError(404)
+        err.message = 'The requested resource was not found.'
+        next(err)
         return
       }
 
@@ -46,9 +65,11 @@ export class ImagesController {
    */
   async findAll (req, res, next) {
     try {
-      const images = await Image.find()
+      const images = await Image.find({ owner: req.user.id })
 
-      res.json(images)
+      res
+        .status(200)
+        .json(images)
     } catch (error) {
       next(error)
     }
@@ -62,7 +83,9 @@ export class ImagesController {
    * @param {Function} next Express next middleware function.
    */
   find (req, res, next) {
-    res.json(req.image)
+    res
+      .status(200)
+      .json(req.image)
   }
 
   /**
@@ -89,6 +112,7 @@ export class ImagesController {
       const data = await response.json()
 
       const image = new Image({
+        owner: req.user.id,
         imageUrl: data.imageUrl,
         description: req.body.description,
         imageId: data.id
@@ -100,7 +124,13 @@ export class ImagesController {
         .status(201)
         .json(image)
     } catch (error) {
-      next(error)
+      let err = error
+      if (error.name === 'ValidationError') {
+        err = createError(400)
+        err.cause = error
+        err.message = 'The request cannot or will not be processed due to something that is perceived to be a client error (for example validation error).'
+      }
+      next(err)
     }
   }
 
@@ -133,7 +163,13 @@ export class ImagesController {
         .status(204)
         .end()
     } catch (error) {
-      next(error)
+      let err = error
+      if (error.name === 'ValidationError') {
+        err = createError(400)
+        err.cause = error
+        err.message = 'The request cannot or will not be processed due to something that is perceived to be a client error (for example validation error).'
+      }
+      next(err)
     }
   }
 
@@ -173,12 +209,18 @@ export class ImagesController {
         .status(204)
         .end()
     } catch (error) {
-      next(error)
+      let err = error
+      if (error.name === 'ValidationError') {
+        err = createError(400)
+        err.cause = error
+        err.message = 'The request cannot or will not be processed due to something that is perceived to be a client error (for example validation error).'
+      }
+      next(err)
     }
   }
 
   /**
-   * Deletes image.
+   * Deletes an image.
    *
    * @param {object} req Express request object.
    * @param {object} res Express response object.
