@@ -14,24 +14,28 @@ router.get('/', (req, res) => res.json({
   message: 'Welcome to version 1 of this API!',
   endpoints: [
     {
-      description: 'Gets a list of all images owned by the authenticated user.',
-      endpoint: 'GET /images'
+      endpoint: 'GET /images',
+      description: 'Gets a list of all images owned by the authenticated user.'
     },
     {
-      description: 'Create an image.',
-      endpoint: 'POST /images'
+      endpoint: 'POST /images',
+      description: 'Create an image.'
     },
     {
-      description: 'Edits an image.',
-      endpoint: 'PUT /images/:id'
+      endpoint: 'GET /image/:id',
+      description: 'Gets a specific image'
     },
     {
-      description: 'Partially edits an image.',
-      endpoint: 'PATCH /images/:id'
+      endpoint: 'PUT /images/:id',
+      description: 'Edits an image.'
     },
     {
-      description: 'Deletes an image.',
-      endpoint: 'DELETE /images/:id'
+      endpoint: 'PATCH /images/:id',
+      description: 'Partially edits an image.'
+    },
+    {
+      endpoint: 'DELETE /images/:id',
+      description: 'Deletes an image.'
     }
   ]
 }))
