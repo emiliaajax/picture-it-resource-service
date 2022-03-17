@@ -17,7 +17,8 @@ const schema = new mongoose.Schema({
     required: true
   },
   description: {
-    type: String
+    type: String,
+    required: true
   },
   imageId: {
     type: String

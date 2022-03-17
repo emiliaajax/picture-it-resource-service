@@ -8,6 +8,7 @@
 import { Image } from '../../models/image.js'
 import createError from 'http-errors'
 import fetch from 'node-fetch'
+import validator from 'validator'
 
 /**
  * Encapsulates a controller.
@@ -23,9 +24,7 @@ export class ImagesController {
    */
   async authorize (req, res, next) {
     if (req.user.id !== req.image.owner) {
-      const err = createError(403)
-      err.message = 'The request contained valid data and was understood by the server, but the server is refusing action due to the authenticated user not having the necessary permissions for the resource.'
-      next(err)
+      next(createError(403))
     }
     next()
   }
@@ -43,10 +42,7 @@ export class ImagesController {
       const image = await Image.findById(id)
 
       if (!image) {
-        const err = createError(404)
-        err.message = 'The requested resource was not found.'
-        next(err)
-        return
+        return next(createError(404))
       }
 
       req.image = image
@@ -104,7 +100,7 @@ export class ImagesController {
           'X-API-Private-Token': process.env.PERSONAL_ACCESS_TOKEN
         },
         body: JSON.stringify({
-          data: Buffer.from(req.body.data, 'base64'),
+          data: req.body.data,
           contentType: req.body.contentType
         })
       })
@@ -114,13 +110,18 @@ export class ImagesController {
       const image = new Image({
         owner: req.user.id,
         imageUrl: data.imageUrl,
-        description: req.body.description,
+        description: validator.escape(req.body.description),
         imageId: data.id
       })
 
       await image.save()
 
+      const location = new URL(
+        `${req.protocol}://${req.get('host')}${req.baseUrl}/${image._id}`
+      )
+
       res
+        .location(location.href)
         .status(201)
         .json(image)
     } catch (error) {
@@ -142,6 +143,10 @@ export class ImagesController {
    */
   async edit (req, res, next) {
     try {
+      if (!req.body.data || !req.body.contentType || !req.body.description) {
+        next(createError(400))
+      }
+
       await fetch(`https://courselab.lnu.se/picture-it/images/api/v1/images/${req.image.imageId}`, {
         method: 'PUT',
         headers: {
@@ -149,12 +154,12 @@ export class ImagesController {
           'X-API-Private-Token': process.env.PERSONAL_ACCESS_TOKEN
         },
         body: JSON.stringify({
-          data: Buffer.from(req.body.data, 'base64'),
+          data: req.body.data,
           contentType: req.body.contentType
         })
       })
 
-      req.image.description = req.body.description
+      req.image.description = validator.escape(req.body.description)
 
       await req.image.save()
 
@@ -199,7 +204,7 @@ export class ImagesController {
       }
 
       if (req.body.description) {
-        req.image.description = req.body.description
+        req.image.description = validator.escape(req.body.description)
         await req.image.save()
       }
 
