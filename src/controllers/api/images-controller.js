@@ -93,7 +93,7 @@ export class ImagesController {
    */
   async create (req, res, next) {
     try {
-      const response = await fetch('https://courselab.lnu.se/picture-it/images/api/v1/images', {
+      const response = await fetch(process.env.IMAGE_SERVICE_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -147,7 +147,7 @@ export class ImagesController {
         next(createError(400))
       }
 
-      await fetch(`https://courselab.lnu.se/picture-it/images/api/v1/images/${req.image.imageId}`, {
+      await fetch(process.env.IMAGE_SERVICE_URL + `${req.image.imageId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -193,7 +193,7 @@ export class ImagesController {
         if (req.body.contentType) {
           imageData.contentType = req.body.contentType
         }
-        await fetch(`https://courselab.lnu.se/picture-it/images/api/v1/images/${req.image.imageId}`, {
+        await fetch(process.env.IMAGE_SERVICE_URL + `${req.image.imageId}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -230,7 +230,7 @@ export class ImagesController {
    */
   async delete (req, res, next) {
     try {
-      await fetch(`https://courselab.lnu.se/picture-it/images/api/v1/images/${req.image.imageId}`, {
+      await fetch(process.env.IMAGE_SERVICE_URL + `${req.image.imageId}`, {
         method: 'DELETE',
         headers: {
           'X-API-Private-Token': process.env.PERSONAL_ACCESS_TOKEN
